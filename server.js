@@ -4,6 +4,8 @@ const server = http.createServer((req, res) => {
 
 	// res.setHeader("Content-Type", "text/html");
 	// res.statusCode = 200;
+	console.log(req.url);
+	console.log(req.method);
 	res.writeHead(200, { "Content-Type": "application/json" });
 	res.end(JSON.stringify({ message: "hello world" }));
 });
