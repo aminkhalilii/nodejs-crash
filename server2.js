@@ -14,27 +14,33 @@ let users = [
 		name: "hamed",
 	},
 ];
-const loger = (req, res, next) => {
+// logger middleware
+const logger = (req, res, next) => {
 	console.log(`${req.method} ${req.url}`);
 	next();
 };
+// json middleware
+const jsonMiddleware = (req, res, next) => {
+	res.setHeader('Content-Type','application/json')
+	next();
+}
 const server = createServer((req, res) => {
-	loger(req, res, () => {
-		if (req.url === "/api/users" && req.method === "GET") {
-			res.writeHead(200, { "Content-Type": "application/json" });
-			res.end(JSON.stringify(users));
-		}
-		if (req.url.match(/\api\/users\/([0-9]+)/) && req.method === "GET") {
-			const id = req.url.split("/")[3];
-			const user = users.find((user) => user.id === parseInt(id));
-			if (user) {
-				res.writeHead(200, { "Content-Type": "application/json" });
-				res.end(JSON.stringify(user));
-			} else {
-				res.writeHead(404, { "Content-Type": "application/json" });
-				res.end(JSON.stringify({ message: "user not found" }));
+	logger(req, res, () => {
+		jsonMiddleware(req, res, () => {
+			if (req.url === "/api/users" && req.method === "GET") {
+				res.end(JSON.stringify(users));
 			}
-		}
+			if (req.url.match(/\api\/users\/([0-9]+)/) && req.method === "GET") {
+				const id = req.url.split("/")[3];
+				const user = users.find((user) => user.id === parseInt(id));
+				if (user) {
+					res.end(JSON.stringify(user));
+				} else {
+					res.statusCode = 404;
+					res.end(JSON.stringify({ message: "user not found" }));
+				}
+			}
+		});
 	});
 });
 
